@@ -3,7 +3,11 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "bin": {
+    "cerebro": "./cerebro"
+  },
   "scripts": {
+    "postinstall": "bash scripts/postinstall-cerebro.sh",
     "dev": "tsx server.ts",
     "backend:dev": "python3 -m uvicorn backend.main:app --host 127.0.0.1 --port 8000 --reload",
     "chat:offline": "python3 chat_cli.py",
