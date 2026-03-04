@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import os
 
-from config import LLM_PROVIDER, VERTEX_CONFIG
+from config import LLM_PROVIDER
 from indexer import rebuild_index
 from rag import RAGEngine, active_model_name, ask_llm, llm_available
 
@@ -35,7 +35,7 @@ def _style(text: str, code: str) -> str:
 
 def _print_header() -> None:
     title = _style("CEREBRO CENTRAL", "1;95")
-    subtitle = _style("Vertex/Ollama • RAG local", "2;37")
+    subtitle = _style("Assistente local • RAG", "2;37")
     print("\n" + _style("=" * 54, "95"))
     print(f" {title}")
     print(f" {subtitle}")
@@ -44,23 +44,13 @@ def _print_header() -> None:
 
 def run() -> int:
     _print_header()
-    print(f"{_style('Provider:', '1;94')} {LLM_PROVIDER}")
-    if LLM_PROVIDER == "vertex":
-        print(f"{_style('Auth mode:', '1;94')} {VERTEX_CONFIG['auth_mode']}")
-    print(f"{_style('Modelo:', '1;94')} {active_model_name()}")
 
     indexed_docs = rebuild_index()
     engine = RAGEngine()
     print(f"{_style('Índice:', '1;94')} {indexed_docs} chunks carregados.")
 
     if not llm_available():
-        if LLM_PROVIDER == "vertex":
-            print(
-                "Vertex indisponível. Configure: VERTEX_PROJECT_ID, VERTEX_LOCATION, "
-                "VERTEX_MODEL e VERTEX_ACCESS_TOKEN"
-            )
-        else:
-            print("Ollama indisponível. Inicie com: ollama serve")
+        print("Modelo indisponível no momento. Verifique as credenciais/configuração.")
 
     while True:
         try:
