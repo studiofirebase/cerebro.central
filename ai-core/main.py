@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+import shutil
 
 from config import LLM_PROVIDER
 from indexer import rebuild_index
@@ -34,12 +35,16 @@ def _style(text: str, code: str) -> str:
 
 
 def _print_header() -> None:
+    width = max(60, shutil.get_terminal_size((100, 20)).columns)
+    line = "=" * width
     title = _style("CEREBRO CENTRAL", "1;95")
     subtitle = _style("Assistente local • RAG", "2;37")
-    print("\n" + _style("=" * 54, "95"))
-    print(f" {title}")
-    print(f" {subtitle}")
-    print(_style("=" * 54, "95"))
+    if _ansi_enabled():
+        print("\033[2J\033[H", end="")
+    print("\n" + _style(line, "95"))
+    print(_style(title.center(width), "1;95"))
+    print(_style(subtitle.center(width), "2;37"))
+    print(_style(line, "95"))
 
 
 def run() -> int:

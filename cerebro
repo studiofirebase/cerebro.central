@@ -22,6 +22,12 @@ fi
 
 cd "$workspace"
 
+if [[ -f "$HOME/.cerebro-central.env" ]]; then
+  set -a
+  source "$HOME/.cerebro-central.env"
+  set +a
+fi
+
 if [[ -x "$workspace/.venv/bin/python" ]]; then
   python_cmd="$workspace/.venv/bin/python"
 fi

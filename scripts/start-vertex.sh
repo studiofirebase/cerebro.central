@@ -12,6 +12,7 @@ export LLM_PROVIDER="${LLM_PROVIDER:-vertex}"
 export VERTEX_AUTH_MODE="${VERTEX_AUTH_MODE:-auto}"
 export VERTEX_LOCATION="${VERTEX_LOCATION:-us-central1}"
 export VERTEX_MODEL="${VERTEX_MODEL:-gemini-1.5-flash}"
+export VERTEX_API_KEY="${VERTEX_API_KEY:-}"
 
 if [[ -z "${VERTEX_PROJECT_ID:-}" && -n "${GOOGLE_CLOUD_PROJECT:-}" ]]; then
   export VERTEX_PROJECT_ID="$GOOGLE_CLOUD_PROJECT"
@@ -22,7 +23,7 @@ if [[ -z "${VERTEX_PROJECT_ID:-}" ]]; then
   exit 1
 fi
 
-if [[ "${VERTEX_AUTH_MODE}" == "gcloud" || "${VERTEX_AUTH_MODE}" == "auto" ]]; then
+if [[ -z "${VERTEX_API_KEY}" && ( "${VERTEX_AUTH_MODE}" == "gcloud" || "${VERTEX_AUTH_MODE}" == "auto" ) ]]; then
   if command -v gcloud >/dev/null 2>&1; then
     export VERTEX_ACCESS_TOKEN="$(gcloud auth application-default print-access-token 2>/dev/null || true)"
   fi

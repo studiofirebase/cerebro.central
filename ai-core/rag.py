@@ -5,6 +5,7 @@ import os
 import subprocess
 import time
 import urllib.error
+import urllib.parse
 import urllib.request
 
 import numpy as np
@@ -108,6 +109,10 @@ def _resolve_vertex_access_token() -> str:
     return ""
 
 
+def _resolve_vertex_api_key() -> str:
+    return VERTEX_CONFIG["api_key"].strip()
+
+
 def _resolve_vertex_project_id(allow_gcloud: bool = True) -> str:
     from_env = os.getenv("GOOGLE_CLOUD_PROJECT", "").strip()
     if from_env:
@@ -167,18 +172,24 @@ def _ask_ollama(prompt: str) -> str:
 
 def _ask_vertex(prompt: str) -> str:
     project_id = _resolve_vertex_project_id(allow_gcloud=True)
+    api_key = _resolve_vertex_api_key()
     access_token = _resolve_vertex_access_token()
-    if not project_id or not access_token:
+    if not project_id or (not api_key and not access_token):
         raise RuntimeError(
             "Vertex não configurado. Defina VERTEX_PROJECT_ID, VERTEX_LOCATION, "
-            "VERTEX_MODEL e VERTEX_ACCESS_TOKEN, ou use VERTEX_AUTH_MODE=gcloud."
+            "VERTEX_MODEL e VERTEX_API_KEY, ou VERTEX_ACCESS_TOKEN/ VERTEX_AUTH_MODE=gcloud."
         )
 
-    endpoint = (
+    base_endpoint = (
         "https://"
         f"{VERTEX_CONFIG['location']}-aiplatform.googleapis.com/v1/projects/"
         f"{project_id}/locations/{VERTEX_CONFIG['location']}/"
         f"publishers/google/models/{VERTEX_CONFIG['model']}:generateContent"
+    )
+    endpoint = (
+        f"{base_endpoint}?key={urllib.parse.quote(api_key)}"
+        if api_key
+        else base_endpoint
     )
 
     payload = {
@@ -227,12 +238,12 @@ def _ask_vertex(prompt: str) -> str:
         request = urllib.request.Request(
             endpoint,
             method="POST",
-            headers={
-                "Content-Type": "application/json",
-                "Authorization": f"Bearer {access_token}",
-            },
+            headers={"Content-Type": "application/json"},
             data=json.dumps(payload).encode("utf-8"),
         )
+
+        if not api_key:
+            request.add_header("Authorization", f"Bearer {access_token}")
 
         try:
             with urllib.request.urlopen(request, timeout=VERTEX_CONFIG["timeout_seconds"]) as response:

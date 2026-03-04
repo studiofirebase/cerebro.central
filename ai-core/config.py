@@ -32,6 +32,7 @@ VERTEX_CONFIG = {
     "location": os.getenv("VERTEX_LOCATION", "us-central1"),
     "model": os.getenv("VERTEX_MODEL", "gemini-1.5-flash"),
     "auth_mode": os.getenv("VERTEX_AUTH_MODE", "env").strip().lower(),
+    "api_key": os.getenv("VERTEX_API_KEY", ""),
     "access_token": os.getenv("VERTEX_ACCESS_TOKEN", ""),
     "temperature": float(os.getenv("VERTEX_TEMPERATURE", "0.2")),
     "top_p": float(os.getenv("VERTEX_TOP_P", "0.9")),
