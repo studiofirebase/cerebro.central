@@ -1,8 +1,19 @@
 {
-  "name": "react-example",
-  "private": true,
-  "version": "0.0.0",
+  "name": "cerebro.central",
+  "private": false,
+  "version": "1.0.0",
+  "description": "CEREBRO CENTRAL CLI",
   "type": "module",
+  "files": [
+    "cerebro",
+    "ai-core/*.py",
+    "ai-core/requirements.txt",
+    "backend/*.py",
+    "scripts/*.sh",
+    "chat_cli.py",
+    "requirements.txt",
+    "README.md"
+  ],
   "bin": {
     "cerebro": "./cerebro"
   },
