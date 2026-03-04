@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import os
+
 from config import LLM_PROVIDER, VERTEX_CONFIG
 from indexer import rebuild_index
 from rag import RAGEngine, active_model_name, ask_llm, llm_available
@@ -20,16 +22,36 @@ Responda com passos curtos e código otimizado.
 """.strip()
 
 
+def _ansi_enabled() -> bool:
+    term = os.getenv("TERM", "")
+    return term != "dumb"
+
+
+def _style(text: str, code: str) -> str:
+    if not _ansi_enabled():
+        return text
+    return f"\033[{code}m{text}\033[0m"
+
+
+def _print_header() -> None:
+    title = _style("CEREBRO CENTRAL", "1;95")
+    subtitle = _style("Vertex/Ollama • RAG local", "2;37")
+    print("\n" + _style("=" * 54, "95"))
+    print(f" {title}")
+    print(f" {subtitle}")
+    print(_style("=" * 54, "95"))
+
+
 def run() -> int:
-    print("Mini Copilot Python (RAG local)")
-    print(f"Provider LLM: {LLM_PROVIDER}")
+    _print_header()
+    print(f"{_style('Provider:', '1;94')} {LLM_PROVIDER}")
     if LLM_PROVIDER == "vertex":
-        print(f"Vertex auth mode: {VERTEX_CONFIG['auth_mode']}")
-    print(f"Modelo configurado: {active_model_name()}")
+        print(f"{_style('Auth mode:', '1;94')} {VERTEX_CONFIG['auth_mode']}")
+    print(f"{_style('Modelo:', '1;94')} {active_model_name()}")
 
     indexed_docs = rebuild_index()
     engine = RAGEngine()
-    print(f"Índice carregado com {indexed_docs} chunks.")
+    print(f"{_style('Índice:', '1;94')} {indexed_docs} chunks carregados.")
 
     if not llm_available():
         if LLM_PROVIDER == "vertex":
@@ -42,7 +64,7 @@ def run() -> int:
 
     while True:
         try:
-            question = input("\nPergunta (/exit para sair): ").strip()
+            question = input(f"\n{_style('✦ Você', '1;96')} > ").strip()
         except EOFError:
             break
 
@@ -53,7 +75,7 @@ def run() -> int:
         if question == "/reindex":
             indexed_docs = rebuild_index()
             engine.reload()
-            print(f"Reindexado com {indexed_docs} chunks.")
+            print(f"{_style('✔', '1;92')} Reindexado com {indexed_docs} chunks.")
             continue
 
         results = engine.search(question)
@@ -63,13 +85,13 @@ def run() -> int:
         try:
             answer = ask_llm(prompt)
         except Exception as exc:  # noqa: BLE001
-            print(f"Erro LLM: {exc}")
+            print(f"{_style('Erro LLM:', '1;91')} {exc}")
             continue
 
-        print("\nResposta:\n")
+        print(f"\n{_style('✦ Cerebro', '1;95')}\n")
         print(answer)
 
-    print("Encerrado.")
+    print(_style("Encerrado.", "2;37"))
     return 0
 
 

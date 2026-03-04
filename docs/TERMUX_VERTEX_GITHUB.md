@@ -9,6 +9,8 @@ chmod +x scripts/termux-setup.sh scripts/start-vertex.sh
 ./scripts/termux-setup.sh
 ```
 
+Isso instala o comando global `cerebro` no Termux.
+
 ## 2) Configurar Vertex no Termux
 
 ```bash
@@ -23,7 +25,7 @@ export VERTEX_ACCESS_TOKEN=seu-token
 Iniciar:
 
 ```bash
-./scripts/start-vertex.sh
+cerebro central
 ```
 
 ## 3) Subir para GitHub no branch twitter
