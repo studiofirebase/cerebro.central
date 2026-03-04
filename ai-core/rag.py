@@ -88,7 +88,7 @@ def _resolve_vertex_access_token() -> str:
     token = VERTEX_CONFIG["access_token"].strip()
     auth_mode = VERTEX_CONFIG["auth_mode"]
 
-    if auth_mode in {"env", "auto"} and token:
+    if token:
         return token
 
     if auth_mode in {"gcloud", "auto"}:
